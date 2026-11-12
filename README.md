@@ -16,7 +16,7 @@ Find-Fix/
 ├── .github/workflows/       ← CI (GitHub Actions)
 ├── docker-compose.yml       ← PostgreSQL + PostGIS para desenvolvimento local
 ├── AGENTS.md                ← regras de trabalho (Git, segredos, fronteiras, testes)
-└── (configuração na raiz: package.json, Prettier, tsconfig, vercel.json)
+└── (configuração na raiz: package.json, Prettier, tsconfig)
 ```
 
 Cada app tem o seu `AGENTS.md` com as regras específicas.
@@ -114,7 +114,7 @@ Ainda não está ligado. O plano é tudo em planos gratuitos:
   - `apps/mobile` → a PWA (build estática);
   - `apps/web` → a API e o `/admin` (funções serverless).
 - **Porquê dois projetos e não um:** cada app tem o seu deploy e as suas pré-visualizações por PR, e uma não parte a outra. O preço é que a PWA e a API ficam em domínios diferentes, por isso a API só aceita chamadas das origens listadas na variável `CORS_ORIGINS`.
-- Cada merge na `main` publica em produção. O `vercel.json` da raiz será substituído por um em cada app quando se ligar a Vercel.
+- Cada merge na `main` publica em produção. Cada app tem o seu `vercel.json` (instalação a partir da raiz do monorepo e comandos de build).
 
 Variáveis de ambiente do servidor (`apps/web`): `DATABASE_URL`, `PAYLOAD_SECRET` e `CORS_ORIGINS`. Nunca vão para o repositório (só o `.env.example`).
 
