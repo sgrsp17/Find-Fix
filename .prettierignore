@@ -6,3 +6,4 @@ package-lock.json
 payload-types.ts
 importMap.js
 next-env.d.ts
+migrations
