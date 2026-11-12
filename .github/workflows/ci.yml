@@ -18,3 +18,7 @@ jobs:
       - run: npm run lint
       - run: npm run typecheck
       - run: npm run build:web -w apps/mobile
+      - run: npm run build -w apps/web
+        env:
+          DATABASE_URL: postgres://ci:ci@127.0.0.1:5432/ci
+          PAYLOAD_SECRET: ci-secret-apenas-para-build

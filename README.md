@@ -4,13 +4,12 @@ App (PWA) que torna reparações e remodelações de interiores mais acessíveis
 
 ## Estrutura (monorepo, npm workspaces)
 
-| Pasta              | Conteúdo                                              |
-| ------------------ | ----------------------------------------------------- |
-| `apps/mobile`      | App Expo (React Native, Expo Router, NativeWind)      |
-| `packages/shared`  | Tipos e código partilhado (`@findfix/shared`)         |
-| `docker-compose.yml` | PostgreSQL + PostGIS para desenvolvimento local     |
-
-O backend (Next.js + Payload) entrará em `apps/web`.
+| Pasta                | Conteúdo                                              |
+| -------------------- | ----------------------------------------------------- |
+| `apps/mobile`        | App Expo (React Native, Expo Router, NativeWind)      |
+| `packages/shared`    | Tipos e código partilhado (`@findfix/shared`)         |
+| `apps/web`           | Next.js + Payload (API REST, autenticação e `/admin`) |
+| `docker-compose.yml` | PostgreSQL + PostGIS para desenvolvimento local       |
 
 ## Arrancar
 
@@ -19,7 +18,9 @@ Requisitos: Node 24+, Docker (para a base de dados).
 ```bash
 npm install
 cp .env.example .env
+cp apps/web/.env.example apps/web/.env   # e define o PAYLOAD_SECRET
 npm run db:up        # Postgres + PostGIS em localhost:5432
+npm run dev -w apps/web   # API + /admin em http://localhost:3000
 npm run web          # app no browser (PWA)
 npm run mobile       # Expo (QR code para Expo Go)
 ```

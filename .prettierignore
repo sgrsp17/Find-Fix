@@ -2,3 +2,7 @@ node_modules
 dist
 .expo
 package-lock.json
+.next
+payload-types.ts
+importMap.js
+next-env.d.ts
