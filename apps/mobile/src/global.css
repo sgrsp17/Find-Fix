@@ -1,0 +1,14 @@
+@import 'tailwindcss/theme.css' layer(theme);
+@import 'tailwindcss/preflight.css' layer(base);
+@import 'tailwindcss/utilities.css';
+
+@import 'nativewind/theme';
+
+/* Paleta Tech Trust (modo escuro + âmbar) */
+@theme {
+  --color-night: #1b2a4a;
+  --color-electric: #3b82f6;
+  --color-amber: #f5a623;
+  --color-mist: #f4f6f9;
+  --color-slate: #64748b;
+}

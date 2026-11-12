@@ -1,0 +1,14 @@
+node_modules/
+.expo/
+dist/
+web-build/
+*.log
+.env
+.env.*
+!.env.example
+.DS_Store
+expo-env.d.ts
+
+# Documentação/gestão do projeto (fora do repositório)
+/Documentacao_Projeto/
+.claude/

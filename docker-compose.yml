@@ -1,0 +1,21 @@
+# Base de dados local para desenvolvimento (PostgreSQL + PostGIS)
+services:
+  db:
+    image: postgis/postgis:16-3.4
+    container_name: findfix-db
+    environment:
+      POSTGRES_USER: findfix
+      POSTGRES_PASSWORD: findfix
+      POSTGRES_DB: findfix
+    ports:
+      - "5432:5432"
+    volumes:
+      - findfix-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U findfix"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  findfix-pgdata:

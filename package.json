@@ -1,0 +1,25 @@
+{
+  "name": "findfix",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "mobile": "npm run start -w apps/mobile",
+    "web": "npm run web -w apps/mobile",
+    "lint": "npm run lint --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "format": "prettier --write \"apps/**/*.{ts,tsx,js,mjs,json,css}\" \"packages/**/*.{ts,json}\"",
+    "format:check": "prettier --check \"apps/**/*.{ts,tsx,js,mjs,json,css}\" \"packages/**/*.{ts,json}\"",
+    "db:up": "docker compose up -d",
+    "db:down": "docker compose down"
+  },
+  "devDependencies": {
+    "prettier": "^3.3.3"
+  },
+  "overrides": {
+    "lightningcss": "1.30.1"
+  }
+}
