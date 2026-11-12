@@ -41,7 +41,7 @@ Vercel (plano Hobby) liga-se ao repositório: cada merge em `main` faz deploy da
 
 ## Design
 
-Paleta Tech Trust, modo escuro: Azul noite `#1B2A4A`, Âmbar `#F5A623`, Neblina `#F4F6F9`, Ardósia `#64748B`. Tokens em `apps/mobile/src/global.css` (`bg-night`, `text-amber`, `text-mist`, …).
+O design de referência são os mockups do Figma. **Os ecrãs atuais ainda não são coerentes com os mockups: são apenas páginas demonstrativas**, até à transposição dos mockups. Os tokens de estilo estão em `apps/mobile/src/global.css`.
 
 ## Fluxo de trabalho
 

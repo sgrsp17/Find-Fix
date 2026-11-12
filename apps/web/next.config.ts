@@ -7,6 +7,8 @@ const __filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(__filename)
 
 const nextConfig: NextConfig = {
+  // Impede o next dev de reescrever o AGENTS.md
+  agentRules: false,
   images: {
     localPatterns: [
       {

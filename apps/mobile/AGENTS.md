@@ -1,41 +1,52 @@
-This is an Expo/React Native mobile application. Prioritize mobile-first patterns, performance, and cross-platform compatibility.
+# apps/mobile — Instruções para agentes
 
-## Expo has changed — do not trust your training data
+App Expo/React Native, exportada para web e distribuída como **PWA** (sem lojas). Complementa o `AGENTS.md` da raiz. Dar prioridade a padrões mobile-first, desempenho e compatibilidade com a web.
 
-Expo ships breaking changes every SDK release. APIs you remember are likely renamed, moved, or removed. Before writing any code that touches an Expo, EAS, or React Native API:
+## O Expo muda: não confiar na memória
 
-1. Read the major version of the `expo` package in `package.json`.
-2. Fetch the matching versioned docs: `https://docs.expo.dev/versions/v<major>.0.0/`
-3. For anything else, fetch https://docs.expo.dev/llms.txt — an index of all Expo docs with corrections to common LLM misconceptions. Follow its links to the specific page you need; never answer from memory.
+O Expo traz alterações incompatíveis a cada SDK. Antes de escrever código que toque em Expo, EAS ou React Native:
 
-## Commands
+1. Ler a versão major do pacote `expo` no `package.json`.
+2. Consultar a documentação dessa versão: `https://docs.expo.dev/versions/v<major>.0.0/`.
+3. Para o resto, consultar https://docs.expo.dev/llms.txt e seguir as ligações para a página certa. Nunca responder de memória.
 
-Use `bunx` instead of `npx` if the project uses bun (`bun.lock` present).
+## Comandos
 
 ```bash
-npx expo install <package>  # ALWAYS use instead of npm/yarn/pnpm/bun add — resolves SDK-compatible versions
-npx expo start              # start the dev server
+npx expo install <pacote>   # SEMPRE em vez de npm install: resolve versões compatíveis com o SDK
+npm run web                 # app no browser (PWA), a partir da raiz do repositório
 npx expo lint               # lint
 npx tsc --noEmit            # typecheck
-npx expo-doctor             # diagnose dependency and config issues
-npx expo install --fix      # fix incompatible package versions
+npx expo-doctor             # diagnóstico de dependências e configuração
+npx expo install --fix      # corrige versões incompatíveis
+npm run build:web           # export estático para a Vercel
 ```
 
-Run lint and typecheck before declaring any task done.
+## Navegação
 
-## Navigation & Routing
+- Usar **Expo Router**. As rotas vivem em `src/app/`: cada ficheiro é um ecrã e os `_layout.tsx` definem os navegadores. O código que não é rota (componentes, hooks, utilitários) fica fora de `src/app/`.
+- Importar `Link`, `router` e `useLocalSearchParams` de `expo-router`.
 
-- Use **Expo Router** for all navigation. Routes live in `src/app/` — every file there is a screen, `_layout.tsx` files define navigators. Keep non-route code (components, hooks, utils) outside `src/app/`.
-- Import `Link`, `router`, and `useLocalSearchParams` from `expo-router`.
-- Docs: https://docs.expo.dev/router/introduction.md
+## Interface e estilos (NativeWind v5)
 
-## Building with EAS
+- O design (UX/UI, cores, temas, espaçamentos) está definido nos mockups do Figma. A implementação segue o Figma e não decide o aspeto por conta própria. Em caso de dúvida ou omissão no Figma, perguntar.
+- Os tokens de design (cores, etc.) ficam em `src/global.css` e espelham o Figma. Não usar valores fixos no JSX: se faltar um token, criá-lo aí.
+- `global.css` importa-se uma única vez, em `src/app/_layout.tsx`.
+- Acessibilidade: nomes acessíveis nos botões de ícone, contraste adequado e foco visível.
 
-Use EAS to build, sign, and submit the app in the cloud (`eas build`, `eas submit`) and to ship over-the-air updates (`eas update`) — no local Xcode or Android Studio required. Run EAS CLI as `bunx eas-cli <command>` in Bun projects, or `npx eas-cli@latest <command>` otherwise; substitute that for bare `eas` in docs examples.
-Docs: https://docs.expo.dev/eas/index.md
+## PWA e módulos nativos
 
-## Rules
+- A app corre na web, por isso **antes de adicionar uma biblioteca confirmar que funciona em PWA**. Exemplos já avaliados: `react-native-maps` não funciona (usar MapLibre ou Leaflet) e `expo-notifications` não envia notificações para a web (usar Web Push).
+- Não existem as pastas `ios/` e `android/` (são geradas pelo Expo). Nunca as criar nem editar à mão: configurar em `app.json` e com config plugins.
+- Não usar `eas submit` nem publicar nas lojas.
+- Preferir módulos recomendados do Expo a bibliotecas de terceiros.
 
-- If `ios/` and `android/` directories do not exist, they are generated (Continuous Native Generation). Never create or edit them by hand — configure native behavior in `app.json` and config plugins.
-- Expo Go only includes its bundled native modules. After adding a library with native code, the app needs a development build: `npx expo run:ios|android` locally, or `eas build --profile development`.
-- Prefer recommended Expo modules over third-party libraries, and check your available skills before adding dependencies. Docs: https://docs.expo.dev/versions/latest/index.md
+### Nota para implementação futura: ecrã de instalação da PWA
+
+Quem abre a app pelo link, no navegador, deve ver um ecrã que explica como adicioná-la ao ecrã principal e começar a usá-la como PWA. Este ecrã segue o UX do resto da app (Figma), mas o conteúdo são as instruções de instalação (diferentes em iOS e Android). Só deve aparecer quando a app **não** está a correr como PWA instalada; dentro da PWA instalada abre-se diretamente a app. Isto também importa para as notificações push: no iPhone só funcionam com a app instalada. Ainda não está implementado, e o desenho depende do Figma. Antes de implementar, confirmar como detetar o modo PWA (por exemplo `display-mode: standalone` e, no iOS, `navigator.standalone`) na versão do Expo em uso.
+
+## API
+
+- A app comunica com `apps/web` por HTTP. O token JWT vai no cabeçalho `Authorization: JWT <token>` (não `Bearer`).
+- Validar com os esquemas de `@findfix/shared` o que é enviado e o que é recebido. A app nunca importa de `apps/web`.
+- Os textos visíveis são em PT-PT.
