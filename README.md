@@ -82,6 +82,19 @@ npm run payload migrate:create <nome>    # gera a migração para produção
 
 Commitar os tipos e a migração gerada. **Em produção (Neon) nunca se usa o `push` do esquema: só migrações.**
 
+### Aplicar migrações no Neon
+
+A API não aplica as migrações sozinha ao arrancar. Aplicam-se à mão, uma vez por migração nova:
+
+1. Cria o ficheiro `apps/web/.env.neon` com uma linha `DATABASE_URL=...`, com a ligação **direta** (sem pooler) copiada do painel do Neon. O ficheiro está ignorado pelo Git: nunca o commites nem partilhes a ligação.
+2. Corre, a partir de `apps/web` (testado em Git Bash):
+
+```bash
+NODE_ENV=production NODE_OPTIONS=--no-deprecation node --no-warnings --env-file=.env.neon ../../node_modules/payload/bin.js migrate
+```
+
+Usa-se o `node` diretamente porque o `npx payload` não aceita o `--env-file` dentro do `NODE_OPTIONS`. O `NODE_ENV=production` desliga o `push` do esquema. Se a migração já estiver aplicada, não repete nada.
+
 ## Qualidade
 
 ```bash
