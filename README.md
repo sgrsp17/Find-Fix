@@ -2,42 +2,108 @@
 
 App (PWA) que torna reparações e remodelações de interiores mais acessíveis e transparentes: diagnóstico por IA e ligação a profissionais. Projeto de grupo de CVPBT (LIGE, ISCTE).
 
-## Estrutura (monorepo, npm workspaces)
+> **Estado:** protótipo (≈30% do MVP), a custo 0 €. Só serviços gratuitos, Stripe sempre em modo de teste e PWA sem publicação nas lojas. As regras de trabalho estão em [`AGENTS.md`](AGENTS.md) (raiz e em cada app); convém ler antes de começar.
 
-| Pasta                | Conteúdo                                              |
-| -------------------- | ----------------------------------------------------- |
-| `apps/mobile`        | App Expo (React Native, Expo Router, NativeWind)      |
-| `packages/shared`    | Tipos e código partilhado (`@findfix/shared`)         |
-| `apps/web`           | Next.js + Payload (API REST, autenticação e `/admin`) |
-| `docker-compose.yml` | PostgreSQL + PostGIS para desenvolvimento local       |
+## Estrutura do repositório
+
+```
+Find-Fix/
+├── apps/
+│   ├── mobile/              ← app Expo (React Native), exportada como PWA
+│   └── web/                 ← Next.js + Payload: API REST, autenticação e /admin
+├── packages/
+│   └── shared/              ← tipos e esquemas Zod usados pelas duas apps
+├── .github/workflows/       ← CI (GitHub Actions)
+├── docker-compose.yml       ← PostgreSQL + PostGIS para desenvolvimento local
+├── AGENTS.md                ← regras de trabalho (Git, segredos, fronteiras, testes)
+└── (configuração na raiz: package.json, Prettier, tsconfig, vercel.json)
+```
+
+Cada app tem o seu `AGENTS.md` com as regras específicas.
+
+## Porque está organizado assim
+
+**Monorepo (npm workspaces).** A app e a API vivem no mesmo repositório para que:
+
+- os tipos e as validações que as duas partilham fiquem sempre alinhados (`packages/shared`);
+- uma alteração que mexe na app e na API seja um só PR, com um só CI;
+- haja um único sítio para versões, formatação e regras.
+
+**`apps/mobile` e `apps/web` são independentes.** A app nunca importa código da API. Só falam por HTTP (REST/JSON) e através do `packages/shared`:
+
+```
+ apps/mobile (PWA) ──HTTP REST──▶ apps/web (Next.js + Payload) ──SQL──▶ PostgreSQL + PostGIS
+        │                                   │
+        └──── @findfix/shared ◀─────────────┘   (tipos e esquemas Zod)
+```
+
+**`packages/shared` é pequeno de propósito.** Só entra aqui o que é usado pelos dois lados, e não pode depender de Expo, Next.js nem Payload. Os esquemas Zod validam o que vem de fora (por exemplo a resposta da IA): o TypeScript só garante tipos em tempo de compilação, e o Zod verifica os dados reais em execução.
+
+**Payload como backend.** A API REST, a autenticação e o backoffice (`/admin`) vêm do Payload, dentro do Next.js. Evita escrever tudo de raiz e dá-nos o controlo de acesso por coleção.
+
+## Autenticação
+
+Há três coleções de autenticação separadas, porque têm campos e permissões muito diferentes:
+
+| Coleção         | Quem            | Onde entra                         |
+| --------------- | --------------- | ---------------------------------- |
+| `equipa`        | Suporte e admin | `/admin` (backoffice web)          |
+| `clientes`      | Clientes        | Só pela app, via API com token JWT |
+| `profissionais` | Profissionais   | Só pela app, via API com token JWT |
+
+O token JWT vai no cabeçalho `Authorization: JWT <token>` (não `Bearer`). As permissões são aplicadas no servidor (`access` do Payload); a app nunca é uma garantia de segurança.
 
 ## Arrancar
 
-Requisitos: Node 24+, Docker (para a base de dados).
+Requisitos: Node 24+ e Docker (para a base de dados).
 
 ```bash
 npm install
-cp .env.example .env
 cp apps/web/.env.example apps/web/.env   # e define o PAYLOAD_SECRET
-npm run db:up        # Postgres + PostGIS em localhost:5432
-npm run dev -w apps/web   # API + /admin em http://localhost:3000
-npm run web          # app no browser (PWA)
-npm run mobile       # Expo (QR code para Expo Go)
+npm run db:up                            # Postgres + PostGIS em localhost:5432
+npm run dev -w apps/web                  # API + /admin em http://localhost:3000
+npm run web                              # app no browser (PWA)
+npm run mobile                           # Expo (QR code para Expo Go)
 ```
+
+Em desenvolvimento o Payload cria as tabelas sozinho. Na primeira vez, cria o teu utilizador da equipa em <http://localhost:3000/admin>.
+
+## Trabalhar com o modelo de dados (Payload)
+
+As coleções ficam em `apps/web/src/collections/` e as regras de acesso em `apps/web/src/access.ts`.
+
+Depois de alterar coleções:
+
+```bash
+cd apps/web
+npm run generate:types                   # atualiza src/payload-types.ts
+npm run payload migrate:create <nome>    # gera a migração para produção
+```
+
+Commitar os tipos e a migração gerada. **Em produção (Neon) nunca se usa o `push` do esquema: só migrações.**
 
 ## Qualidade
 
 ```bash
 npm run lint
 npm run typecheck
-npm run format       # Prettier
+npm run format:check     # (npm run format para corrigir)
 ```
 
-O CI (GitHub Actions) corre formatação, lint, typecheck e build web a cada PR e push para `main`.
+O CI (GitHub Actions) corre formatação, lint, typecheck e as builds da app e da API a cada PR e push para `main`.
 
-## Deploy
+## Deploy (planeado)
 
-Vercel (plano Hobby) liga-se ao repositório: cada merge em `main` faz deploy da build web (`vercel.json`). Base de dados da demo: Neon (Postgres + PostGIS, UE).
+Ainda não está ligado. O plano é tudo em planos gratuitos:
+
+- **Neon:** PostgreSQL + PostGIS, região UE. Adormece sem pedidos e demora a acordar.
+- **Dois projetos Vercel (plano Hobby) a partir deste repositório**, cada um com a sua pasta raiz:
+  - `apps/mobile` → a PWA (build estática);
+  - `apps/web` → a API e o `/admin` (funções serverless).
+- **Porquê dois projetos e não um:** cada app tem o seu deploy e as suas pré-visualizações por PR, e uma não parte a outra. O preço é que a PWA e a API ficam em domínios diferentes, por isso a API só aceita chamadas das origens listadas na variável `CORS_ORIGINS`.
+- Cada merge na `main` publica em produção. O `vercel.json` da raiz será substituído por um em cada app quando se ligar a Vercel.
+
+Variáveis de ambiente do servidor (`apps/web`): `DATABASE_URL`, `PAYLOAD_SECRET` e `CORS_ORIGINS`. Nunca vão para o repositório (só o `.env.example`).
 
 ## Design
 
@@ -45,4 +111,9 @@ O design de referência são os mockups do Figma. **Os ecrãs atuais ainda não 
 
 ## Fluxo de trabalho
 
-Branches curtas a partir de `main`, PR com CI verde, merge → deploy.
+1. Cria um ramo a partir da `main` (`feat/...`, `fix/...`).
+2. Commits pequenos, no formato Conventional Commits (tipo em inglês, descrição em português): `feat(web): adicionar coleção de pedidos`.
+3. Abre um PR com o CI verde e os testes manuais feitos.
+4. O merge na `main` publica em produção.
+
+Não se mexe diretamente na `main`.
