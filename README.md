@@ -105,18 +105,24 @@ npm run format:check     # (npm run format para corrigir)
 
 O CI (GitHub Actions) corre formatação, lint, typecheck e as builds da app e da API a cada PR e push para `main`.
 
-## Deploy (planeado)
+## Deploy
 
-Ainda não está ligado. O plano é tudo em planos gratuitos:
+Tudo em planos gratuitos:
 
 - **Neon:** PostgreSQL + PostGIS, região UE. Adormece sem pedidos e demora a acordar.
 - **Dois projetos Vercel (plano Hobby) a partir deste repositório**, cada um com a sua pasta raiz:
-  - `apps/mobile` → a PWA (build estática);
-  - `apps/web` → a API e o `/admin` (funções serverless).
+  - `apps/mobile` → a PWA (build estática): <https://find-fix-mobile.vercel.app>
+  - `apps/web` → a API e o `/admin` (funções serverless): <https://find-fix-website.vercel.app> (backoffice em <https://find-fix-website.vercel.app/admin>)
 - **Porquê dois projetos e não um:** cada app tem o seu deploy e as suas pré-visualizações por PR, e uma não parte a outra. O preço é que a PWA e a API ficam em domínios diferentes, por isso a API só aceita chamadas das origens listadas na variável `CORS_ORIGINS`.
 - Cada merge na `main` publica em produção. Cada app tem o seu `vercel.json` (instalação a partir da raiz do monorepo e comandos de build).
 
-Variáveis de ambiente do servidor (`apps/web`): `DATABASE_URL`, `PAYLOAD_SECRET` e `CORS_ORIGINS`. Nunca vão para o repositório (só o `.env.example`).
+Variáveis de ambiente do servidor (`apps/web`): `DATABASE_URL`, `PAYLOAD_SECRET` e `CORS_ORIGINS`. Nunca vão para o repositório (só o `.env.example`). Na Vercel as variáveis só se aplicam a deploys novos: depois de as alterar, fazer Redeploy.
+
+O `CORS_ORIGINS` também alimenta a proteção CSRF do Payload, que só aceita o cookie de sessão se a origem do pedido estiver na lista. Por isso tem de incluir **o URL da própria API** (para o `/admin` poder guardar e apagar), o da PWA e, se for preciso, o de desenvolvimento, sem espaços nem barra final:
+
+```
+CORS_ORIGINS=https://find-fix-website.vercel.app,https://find-fix-mobile.vercel.app,http://localhost:8081
+```
 
 ## Design
 
