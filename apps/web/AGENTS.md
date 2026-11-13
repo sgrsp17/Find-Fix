@@ -14,6 +14,7 @@ Next.js e Payload mudam muito entre versões. Antes de escrever código, ler a d
 - A Local API do Payload ignora o `access` por omissão. Quando se passa um `user`, usar `overrideAccess: false`; usar o valor por omissão só com justificação clara.
 - O `/admin` só aceita a coleção `equipa`. Com a base vazia, `first-register` está aberto: criar o primeiro admin logo no primeiro deploy.
 - O CORS usa a variável `CORS_ORIGINS` (origens separadas por vírgulas). Nunca `*`.
+- O `CORS_ORIGINS` também define o `csrf`: o Payload só aceita o cookie de sessão se o `Origin` do pedido estiver na lista. Tem de incluir **o URL da própria API**, senão o `/admin` abre mas não deixa guardar, apagar nem fazer logout ("You are not allowed to perform this action").
 
 ## Base de dados
 
