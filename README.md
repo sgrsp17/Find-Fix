@@ -136,3 +136,4 @@ O design de referência são os mockups do Figma. **Os ecrãs atuais ainda não 
 4. O merge na `main` publica em produção.
 
 Não se mexe diretamente na `main`.
+
