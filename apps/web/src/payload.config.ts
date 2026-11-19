@@ -5,8 +5,13 @@ import { buildConfig } from 'payload'
 import { fileURLToPath } from 'url'
 import sharp from 'sharp'
 
+import { Avaliacoes } from './collections/Avaliacoes'
 import { Clientes } from './collections/Clientes'
+import { Diagnosticos } from './collections/Diagnosticos'
 import { Equipa } from './collections/Equipa'
+import { Marcacoes } from './collections/Marcacoes'
+import { Media } from './collections/Media'
+import { Portfolio } from './collections/Portfolio'
 import { Profissionais } from './collections/Profissionais'
 
 const filename = fileURLToPath(import.meta.url)
@@ -25,7 +30,16 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
   },
-  collections: [Equipa, Clientes, Profissionais],
+  collections: [
+    Equipa,
+    Clientes,
+    Profissionais,
+    Media,
+    Marcacoes,
+    Portfolio,
+    Avaliacoes,
+    Diagnosticos,
+  ],
   cors: allowedOrigins,
   csrf: allowedOrigins,
   editor: lexicalEditor(),

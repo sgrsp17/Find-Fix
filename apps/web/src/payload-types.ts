@@ -72,6 +72,11 @@ export interface Config {
     equipa: Equipa;
     clientes: Cliente;
     profissionais: Profissionai;
+    media: Media;
+    marcacoes: Marcacoe;
+    portfolio: Portfolio;
+    avaliacoes: Avaliacoe;
+    diagnosticos: Diagnostico;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -82,6 +87,11 @@ export interface Config {
     equipa: EquipaSelect<false> | EquipaSelect<true>;
     clientes: ClientesSelect<false> | ClientesSelect<true>;
     profissionais: ProfissionaisSelect<false> | ProfissionaisSelect<true>;
+    media: MediaSelect<false> | MediaSelect<true>;
+    marcacoes: MarcacoesSelect<false> | MarcacoesSelect<true>;
+    portfolio: PortfolioSelect<false> | PortfolioSelect<true>;
+    avaliacoes: AvaliacoesSelect<false> | AvaliacoesSelect<true>;
+    diagnosticos: DiagnosticosSelect<false> | DiagnosticosSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -192,6 +202,13 @@ export interface Equipa {
 export interface Cliente {
   id: number;
   nome: string;
+  telemovel?: string | null;
+  dataNascimento?: string | null;
+  nacionalidade?: string | null;
+  localidade?: string | null;
+  morada?: string | null;
+  codigoPostal?: string | null;
+  fotoPerfil?: (number | null) | Media;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -214,11 +231,74 @@ export interface Cliente {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "media".
+ */
+export interface Media {
+  id: number;
+  alt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
+  focalX?: number | null;
+  focalY?: number | null;
+  sizes?: {
+    thumbnail?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+    card?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+  };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "profissionais".
  */
 export interface Profissionai {
   id: number;
   nome: string;
+  telemovel?: string | null;
+  dataNascimento?: string | null;
+  nacionalidade?: string | null;
+  localizacao?: string | null;
+  fotoPerfil?: (number | null) | Media;
+  titular?: string | null;
+  nif?: string | null;
+  emailProfissional?: string | null;
+  areaTrabalho?: ('construcao' | 'design_interiores') | null;
+  especialidade?: string | null;
+  competencias?:
+    | {
+        nome: string;
+        id?: string | null;
+      }[]
+    | null;
+  raioDeslocacaoKm?: number | null;
+  areaServico?: string | null;
+  morada?: string | null;
+  numeroAndar?: string | null;
+  numeroPorta?: string | null;
+  codigoPostal?: string | null;
+  documentos?: (number | Media)[] | null;
+  verificado?: boolean | null;
+  classificacaoMedia?: number | null;
+  totalAvaliacoes?: number | null;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -238,6 +318,80 @@ export interface Profissionai {
     | null;
   password?: string | null;
   collection: 'profissionais';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "marcacoes".
+ */
+export interface Marcacoe {
+  id: number;
+  servico: string;
+  estado: 'pendente' | 'confirmada' | 'concluida' | 'cancelada';
+  cliente: number | Cliente;
+  profissional: number | Profissionai;
+  data: string;
+  hora: string;
+  localidade: string;
+  morada?: string | null;
+  descricao?: string | null;
+  notas?: string | null;
+  precoPrevisto?: number | null;
+  fotografias?: (number | Media)[] | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "portfolio".
+ */
+export interface Portfolio {
+  id: number;
+  titulo: string;
+  profissional: number | Profissionai;
+  servicoEspecialidade: string;
+  descricao?: string | null;
+  localidade?: string | null;
+  dataConclusao?: string | null;
+  fotografias?: (number | Media)[] | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "avaliacoes".
+ */
+export interface Avaliacoe {
+  id: number;
+  profissional: number | Profissionai;
+  cliente: number | Cliente;
+  marcacao?: (number | null) | Marcacoe;
+  classificacao: number;
+  comentario?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "diagnosticos".
+ */
+export interface Diagnostico {
+  id: number;
+  cliente: number | Cliente;
+  area: 'construcao' | 'interiores';
+  problemaDescrito: string;
+  fotografias?: (number | Media)[] | null;
+  urgencia?: ('low' | 'medium' | 'high') | null;
+  causasProvaveis?:
+    | {
+        descricao: string;
+        id?: string | null;
+      }[]
+    | null;
+  precoMinimo?: number | null;
+  precoMaximo?: number | null;
+  especialidadeRecomendada?: string | null;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -274,6 +428,26 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'profissionais';
         value: number | Profissionai;
+      } | null)
+    | ({
+        relationTo: 'media';
+        value: number | Media;
+      } | null)
+    | ({
+        relationTo: 'marcacoes';
+        value: number | Marcacoe;
+      } | null)
+    | ({
+        relationTo: 'portfolio';
+        value: number | Portfolio;
+      } | null)
+    | ({
+        relationTo: 'avaliacoes';
+        value: number | Avaliacoe;
+      } | null)
+    | ({
+        relationTo: 'diagnosticos';
+        value: number | Diagnostico;
       } | null);
   globalSlug?: string | null;
   user:
@@ -366,6 +540,13 @@ export interface EquipaSelect<T extends boolean = true> {
  */
 export interface ClientesSelect<T extends boolean = true> {
   nome?: T;
+  telemovel?: T;
+  dataNascimento?: T;
+  nacionalidade?: T;
+  localidade?: T;
+  morada?: T;
+  codigoPostal?: T;
+  fotoPerfil?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;
@@ -390,6 +571,32 @@ export interface ClientesSelect<T extends boolean = true> {
  */
 export interface ProfissionaisSelect<T extends boolean = true> {
   nome?: T;
+  telemovel?: T;
+  dataNascimento?: T;
+  nacionalidade?: T;
+  localizacao?: T;
+  fotoPerfil?: T;
+  titular?: T;
+  nif?: T;
+  emailProfissional?: T;
+  areaTrabalho?: T;
+  especialidade?: T;
+  competencias?:
+    | T
+    | {
+        nome?: T;
+        id?: T;
+      };
+  raioDeslocacaoKm?: T;
+  areaServico?: T;
+  morada?: T;
+  numeroAndar?: T;
+  numeroPorta?: T;
+  codigoPostal?: T;
+  documentos?: T;
+  verificado?: T;
+  classificacaoMedia?: T;
+  totalAvaliacoes?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;
@@ -407,6 +614,118 @@ export interface ProfissionaisSelect<T extends boolean = true> {
         createdAt?: T;
         expiresAt?: T;
       };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "media_select".
+ */
+export interface MediaSelect<T extends boolean = true> {
+  alt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  url?: T;
+  thumbnailURL?: T;
+  filename?: T;
+  mimeType?: T;
+  filesize?: T;
+  width?: T;
+  height?: T;
+  focalX?: T;
+  focalY?: T;
+  sizes?:
+    | T
+    | {
+        thumbnail?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        card?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+      };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "marcacoes_select".
+ */
+export interface MarcacoesSelect<T extends boolean = true> {
+  servico?: T;
+  estado?: T;
+  cliente?: T;
+  profissional?: T;
+  data?: T;
+  hora?: T;
+  localidade?: T;
+  morada?: T;
+  descricao?: T;
+  notas?: T;
+  precoPrevisto?: T;
+  fotografias?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "portfolio_select".
+ */
+export interface PortfolioSelect<T extends boolean = true> {
+  titulo?: T;
+  profissional?: T;
+  servicoEspecialidade?: T;
+  descricao?: T;
+  localidade?: T;
+  dataConclusao?: T;
+  fotografias?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "avaliacoes_select".
+ */
+export interface AvaliacoesSelect<T extends boolean = true> {
+  profissional?: T;
+  cliente?: T;
+  marcacao?: T;
+  classificacao?: T;
+  comentario?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "diagnosticos_select".
+ */
+export interface DiagnosticosSelect<T extends boolean = true> {
+  cliente?: T;
+  area?: T;
+  problemaDescrito?: T;
+  fotografias?: T;
+  urgencia?: T;
+  causasProvaveis?:
+    | T
+    | {
+        descricao?: T;
+        id?: T;
+      };
+  precoMinimo?: T;
+  precoMaximo?: T;
+  especialidadeRecomendada?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
